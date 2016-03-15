@@ -1,0 +1,20 @@
+name:           haskgo
+description:    "Go player"
+version:        0.1.0
+cabal-version:  >= 1.8
+build-type:     Simple
+
+Flag dev
+    Description:   Turn on development settings, like auto-reload templates.
+    Default:       False
+
+executable          haskgo
+    main-is:        main.hs
+    hs-source-dirs: src
+    build-depends:  base, vector, hood
+
+    extensions:     
+                    OverloadedStrings
+
+    if flag(dev)
+        ghc-options: -prof -fprof-auto +RTS -xc
