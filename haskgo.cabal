@@ -9,9 +9,14 @@ Flag dev
     Default:       False
 
 executable          haskgo
-    main-is:        main.hs
     hs-source-dirs: src
-    build-depends:  base, vector, hood
+    main-is:        main.hs
+    other-modules:  Base
+
+    build-depends:  base, vector, transformers
+
+                    -- debug dependencies
+                    , hood
 
     extensions:     
                     OverloadedStrings
