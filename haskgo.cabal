@@ -20,6 +20,7 @@ executable          haskgo
 
     extensions:     
                     OverloadedStrings
+                    RecordWildCards
 
     if flag(dev)
         ghc-options: -prof -fprof-auto +RTS -xc

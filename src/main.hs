@@ -13,10 +13,15 @@ import qualified Data.HashMap.Lazy as H
 -
 - 1: This format might actually be preferable to the display representation
 - currently used.
+-
+- (0,0) is the center pice. This means we can use the same `empty` function
+- for all board types
 -}
 
 type Groups = [[Point]]
 type PlayerPoints = [Point]
+
+{-
 
 splitBoard :: Board -> (PlayerPoints,PlayerPoints)
 -- | Split the board into two; one contains only White's pieces, while the
@@ -24,6 +29,7 @@ splitBoard :: Board -> (PlayerPoints,PlayerPoints)
 splitBoard = foldl onRow 
   where
     onRow :: (PlayerPoints, PlayerPoints) -> (Int,[Piece]) -> Use a HashMap?
+-}
 
 
 main = putStrLn "Hello, World!"

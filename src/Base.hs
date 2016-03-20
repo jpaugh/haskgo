@@ -1,75 +1,74 @@
 module Base where
 
-import Data.Maybe (isJust, isNothing)
+import Data.HashMap.Lazy (HashMap)
 import Data.List (intercalate)
+import Data.Maybe (isJust, isNothing)
+
+import qualified Data.HashMap.Lazy as H
+
+data Board =
+        Board { layout :: Layout
+              , size :: Size }
+    deriving (Eq,Show)
+
+
 
 data Player = Black
            | White
     deriving (Eq, Show)
+
+type Piece = Player
+type Point = (Int,Int)
 
 data Size = Full
           | Mid
           | Small
     deriving (Eq, Show)
 
--- TODO: Newtype ADTs
-type Piece = Maybe Player
-type Point = (Int,Int)
-type Board = [[Piece]]
-
 -- | Allows us to use interfaces while Board is still just a type synonym
-newtype BoardADT = Board Board
+newtype VisualBoard = VisualBoard [[Maybe Piece]]
 
-instance Show BoardADT where
-        show (BoardADT board) = showBoard (length board) board
+instance Show VisualBoard where
+        show (VisualBoard board) = showBoard (length board) board
           where
             -- checkColumnLengths size = all (\col -> length col == size) board
             showBoard size
                 -- | checkColumnLengths size /= True = error "Invalid column length"
                 | otherwise = intercalate "\n" . map showRow
-            showRow :: [Piece] -> String
+            showRow :: [Maybe Piece] -> String
             showRow = foldl showCell ""
 
-            showCell :: String -> Piece -> String
+            showCell :: String -> Maybe Piece -> String
             showCell s Nothing = s ++ " ."
             showCell s (Just Black) = s ++ " B"
             showCell s (Just White) = s ++ " W"
 
 empty :: Size -> Board
 -- | An empty board, ready for play
-empty size = replicate (num size) $
-                replicate (num size) Nothing
-  where
-    num Full = 19
-    num Mid = 13
-    num Small = 9
-
-(/$) :: a -> (a -> b) -> b
-(/$) = flip ($)
-infixr 0 /$
+empty size = Board { layout = H.empty, size = size }
 
 isPossibleMove :: Point -> Board -> Bool
 -- | Check whether a move is possible at the given board position; it does
 -- not calculate liveness (alive or dead?), since that involves grouping,
 -- and calculating the liveness of the opponent's adjacent groups
-isPossibleMove (x,y) board = rangeCheck && emptyCheck
+isPossibleMove point@(x,y) board = rangeCheck && emptyCheck
   where
-    rangeCheck = length board > x && length (board !! x) > y
-    emptyCheck = isNothing $ ((board !! x) !! y)
+    rangeCheck = let range = sizeToInt (size board) `quot` 2
+                     in range >= abs x && range >= abs y
+    emptyCheck = H.member point $ layout board
 
-placePiece :: Player -> Point -> Board -> Board
-placePiece player point@(x,y) board
+placePiece :: Piece -> Point -> Board -> Board
+placePiece piece point@(x,y) board
     | not $ isPossibleMove point board = board
-    | otherwise = board /$ modifyNth x updateCell
-        where
-            updateCell :: [Piece] -> [Piece]
-            updateCell = replaceNth y (Just player)
+    | otherwise = board {layout = layout board /$ H.insert point piece}
 
-modifyNth :: Int -> (a -> a) -> [a] -> [a]
-modifyNth n f [] = []
-modifyNth n f (x:xs)
-    | n == 0 = f x : xs
-    | otherwise = x : modifyNth (n - 1) f xs
+sizeToInt :: Size -> Int
+-- | The size of the board as an `Int`
+sizeToInt Full  = 19
+sizeToInt Mid   = 13
+sizeToInt Small =  9
 
-replaceNth :: Int -> a -> [a] -> [a]
-replaceNth n newVal = modifyNth n $ const newVal
+
+(/$) :: a -> (a -> b) -> b
+(/$) = flip ($)
+infixr 0 /$
