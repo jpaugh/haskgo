@@ -13,7 +13,7 @@ executable          haskgo
     main-is:        main.hs
     other-modules:  Base
 
-    build-depends:  base, vector, transformers
+    build-depends:  base, vector, transformers, unordered-containers
 
                     -- debug dependencies
                     , hood

@@ -18,7 +18,7 @@ type Point = (Int,Int)
 type Board = [[Piece]]
 
 -- | Allows us to use interfaces while Board is still just a type synonym
-newtype BoardADT = BoardADT Board
+newtype BoardADT = Board Board
 
 instance Show BoardADT where
         show (BoardADT board) = showBoard (length board) board
