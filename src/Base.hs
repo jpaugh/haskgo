@@ -55,7 +55,7 @@ isPossibleMove point@(x,y) board = rangeCheck && emptyCheck
   where
     rangeCheck = let range = sizeToInt (size board) `quot` 2
                      in range >= abs x && range >= abs y
-    emptyCheck = H.member point $ layout board
+    emptyCheck = not $ H.member point $ layout board
 
 placePiece :: Piece -> Point -> Board -> Board
 placePiece piece point@(x,y) board
