@@ -1,7 +1,7 @@
 module Base where
 
 import Data.HashMap.Lazy (HashMap)
-import Data.List (intercalate)
+import Data.List (intercalate, intersperse)
 import Data.Maybe (isJust, isNothing)
 
 import qualified Data.HashMap.Lazy as H
@@ -9,9 +9,7 @@ import qualified Data.HashMap.Lazy as H
 data Board =
         Board { layout :: Layout
               , size :: Size }
-    deriving (Eq,Show)
-
-
+    deriving (Eq)
 
 data Player = Black
            | White
@@ -25,23 +23,33 @@ data Size = Full
           | Small
     deriving (Eq, Show)
 
--- | Allows us to use interfaces while Board is still just a type synonym
-newtype VisualBoard = VisualBoard [[Maybe Piece]]
-
-instance Show VisualBoard where
-        show (VisualBoard board) = showBoard (length board) board
+instance Show Board where
+        show (Board {..}) = format $ map showPieceAt enumeratePoints
           where
-            -- checkColumnLengths size = all (\col -> length col == size) board
-            showBoard size
-                -- | checkColumnLengths size /= True = error "Invalid column length"
-                | otherwise = intercalate "\n" . map showRow
-            showRow :: [Maybe Piece] -> String
-            showRow = foldl showCell ""
+            showPieceAt :: Point -> Char
+            showPieceAt = showPiece . flip H.lookup layout
 
-            showCell :: String -> Maybe Piece -> String
-            showCell s Nothing = s ++ " ."
-            showCell s (Just Black) = s ++ " B"
-            showCell s (Just White) = s ++ " W"
+            showPiece :: Maybe Piece -> Char
+            showPiece Nothing = '+'
+            showPiece (Just Black) = 'B'
+            showPiece (Just White) = 'W'
+
+            -- | Increasing X with each col; decreasing Y with each cell
+            enumeratePoints :: [Point]
+            enumeratePoints =
+                let max = sizeToInt size `quot` 2
+                    min = -max
+                    xs = [min..max]
+                    ys = [max,max-1..min]
+                in
+                    [(x,y) | y <- ys, x <- xs]
+
+            format :: String -> String
+            format =
+                let toLines = intercalate "\n"
+                    spaceCols = map (intersperse '-')
+                    separateRows = subgroup (sizeToInt size)
+                    in toLines . spaceCols . separateRows
 
 empty :: Size -> Board
 -- | An empty board, ready for play
@@ -72,3 +80,11 @@ sizeToInt Small =  9
 (/$) :: a -> (a -> b) -> b
 (/$) = flip ($)
 infixr 0 /$
+
+subgroup :: Int -> [a] -> [[a]]
+-- | Divide a list's elements into equally sized groups of sublists
+subgroup _ [] = []
+subgroup n xs
+  | n < 1 = error "Negative n"
+  | otherwise = let (l, rest) = splitAt n xs
+                    in l : subgroup n rest
