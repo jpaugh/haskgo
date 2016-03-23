@@ -24,8 +24,15 @@ data Size = Full
     deriving (Eq, Show)
 
 instance Show Board where
-        show (Board {..}) = format $ map showPieceAt enumeratePoints
+        show (Board {..}) = format $ map showPieceAt $ enumeratePoints size
           where
+            format :: String -> String
+            format =
+                let toLines = intercalate "\n"
+                    spaceCols = map (intersperse '-')
+                    separateRows = subgroup (sizeToInt size)
+                    in toLines . spaceCols . separateRows
+
             showPieceAt :: Point -> Char
             showPieceAt = showPiece . flip H.lookup layout
 
@@ -34,22 +41,15 @@ instance Show Board where
             showPiece (Just Black) = 'B'
             showPiece (Just White) = 'W'
 
-            -- | Increasing X with each col; decreasing Y with each cell
-            enumeratePoints :: [Point]
-            enumeratePoints =
-                let max = sizeToInt size `quot` 2
-                    min = -max
-                    xs = [min..max]
-                    ys = [max,max-1..min]
-                in
-                    [(x,y) | y <- ys, x <- xs]
+enumeratePoints :: Size -> [Point]
+-- | Increasing X with each col; decreasing Y with each cell
+enumeratePoints size = [(x,y) | y <- ys, x <- xs]
+  where
+    max = sizeToInt size `quot` 2
+    min = -max
+    xs = [min..max]
+    ys = [max, max-1 .. min]
 
-            format :: String -> String
-            format =
-                let toLines = intercalate "\n"
-                    spaceCols = map (intersperse '-')
-                    separateRows = subgroup (sizeToInt size)
-                    in toLines . spaceCols . separateRows
 
 empty :: Size -> Board
 -- | An empty board, ready for play
