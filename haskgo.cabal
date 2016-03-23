@@ -12,11 +12,9 @@ executable          haskgo
     hs-source-dirs: src
     main-is:        main.hs
     other-modules:  Base
+                    Group
 
-    build-depends:  base, vector, transformers, unordered-containers
-
-                    -- debug dependencies
-                    , hood
+    build-depends:  base, unordered-containers
 
     extensions:     
                     OverloadedStrings

@@ -1,9 +1,10 @@
 module Base where
 
+import Control.Monad
 import Data.HashMap.Lazy (HashMap)
-import Data.List (intercalate, intersperse)
-import Data.Maybe (isJust, isNothing)
-
+import Data.List (intercalate, intersperse, elemIndex)
+import Data.Maybe
+import Data.Unique
 import qualified Data.HashMap.Lazy as H
 
 data Board =
@@ -17,6 +18,10 @@ data Player = Black
 
 type Piece = Player
 type Point = (Int,Int)
+type Group = Int
+-- | A many-to-one mapping from every point on the board to the group that
+-- contains it
+type Groups = HashMap Point Group
 
 data Size = Full
           | Mid
@@ -49,7 +54,6 @@ enumeratePoints size = [(x,y) | y <- ys, x <- xs]
     min = -max
     xs = [min..max]
     ys = [max, max-1 .. min]
-
 
 empty :: Size -> Board
 -- | An empty board, ready for play
