@@ -1,10 +1,12 @@
 module Base where
 
+import Control.Arrow
 import Control.Monad
 import Data.HashMap.Lazy (HashMap)
 import Data.List (intercalate, intersperse, elemIndex)
 import Data.Maybe
 import Data.Unique
+import System.Random
 import qualified Data.HashMap.Lazy as H
 
 data Board =
@@ -14,7 +16,7 @@ data Board =
 
 data Player = Black
            | White
-    deriving (Eq, Show)
+    deriving (Enum, Eq, Show)
 
 type Piece = Player
 type Point = (Int,Int)
@@ -22,11 +24,12 @@ type Group = Int
 -- | A many-to-one mapping from every point on the board to the group that
 -- contains it
 type Groups = HashMap Point Group
+type Layout = HashMap Point Piece
 
 data Size = Full
           | Mid
           | Small
-    deriving (Eq, Show)
+    deriving (Enum, Eq, Show)
 
 instance Show Board where
         show (Board {..}) = format $ map showPieceAt $ enumeratePoints size

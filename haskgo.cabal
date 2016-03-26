@@ -13,12 +13,14 @@ executable          haskgo
     main-is:        main.hs
     other-modules:  Base
                     Group
+                    Random
 
-    build-depends:  base, unordered-containers
+    build-depends:  base, unordered-containers, random
 
     extensions:     
                     OverloadedStrings
                     RecordWildCards
+                    TypeSynonymInstances
 
     if flag(dev)
         ghc-options: -prof -fprof-auto +RTS -xc
