@@ -29,7 +29,7 @@ instance Show Board where
             format :: String -> String
             format =
                 let toLines = intercalate "\n"
-                    spaceCols = map (intersperse '-')
+                    spaceCols = map (intersperse '─')
                     separateRows = subgroup (sizeToInt size)
                     in toLines . spaceCols . separateRows
 
@@ -37,9 +37,9 @@ instance Show Board where
             showPieceAt = showPiece . flip H.lookup layout
 
             showPiece :: Maybe Piece -> Char
-            showPiece Nothing = '+'
-            showPiece (Just Black) = 'B'
-            showPiece (Just White) = 'W'
+            showPiece Nothing = '┼'
+            showPiece (Just Black) = '●'
+            showPiece (Just White) = '○'
 
 enumeratePoints :: Size -> [Point]
 -- | Increasing X with each col; decreasing Y with each cell
