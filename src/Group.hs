@@ -141,3 +141,14 @@ displayGroups board@(Board {..}) groups =
     pointsOnBoard = filter (flip H.member groups) points
     points = enumeratePoints size
     inGroups = groupBy $ \a b -> (fst a == fst b)
+
+
+groupTestBoard :: Board
+groupTestBoard = Board { size = Small, layout = layout }
+  where
+    layout = H.fromList $ concat
+        [ [ (p,White) | p <- [(1,0), (2,0), (3,0), (3,1), (3,2), (2,2), (4,2)]]
+        , [ (p,White) | p <- [(-1,0), (-2,0), (-3,0), (-3,-1), (-3,-2), (-2,-2), (-4,-2)]]
+        , [ (p,Black) | p <- [(0,1), (0,2), (0,3), (-1,3), (-2,3), (-2,2), (-2,4)]]
+        , [ (p,Black) | p <- [(0,-1), (0,-2), (0,-3), (1,-3), (2,-3), (2,-2), (2,-4)]]
+        ]
