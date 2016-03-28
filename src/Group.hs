@@ -30,7 +30,7 @@ import Data.List (intercalate, elemIndex, sort, groupBy)
 import Data.Maybe
 import qualified Data.HashMap.Lazy as H
 
-groupBoard :: Board -> Groups
+groupBoard :: Board -> GroupPoints
 -- | Collect all of the points on the board into their respective groups
 groupBoard board@(Board {..}) = foldl classify H.empty $ zip points groupNumbers
   where
@@ -41,7 +41,7 @@ groupBoard board@(Board {..}) = foldl classify H.empty $ zip points groupNumbers
     points = enumeratePoints size
     groupNumbers = [1..81]
 
-classifyPoint :: Point -> Group -> Board -> Groups -> Groups
+classifyPoint :: Point -> Group -> Board -> GroupPoints -> GroupPoints
 classifyPoint point nextGroup board@(Board {..}) groups =
         case lookupBoard point of
             Nothing -> groups
@@ -50,7 +50,7 @@ classifyPoint point nextGroup board@(Board {..}) groups =
 
     -- Either find an existing, adjacent group to add this piece to, or
     -- start a new one
-    findGroupFor :: Piece -> Groups
+    findGroupFor :: Piece -> GroupPoints
     findGroupFor piece = insertAndFindMembers $
         case adjGroupIdx of
             Nothing -> nextGroup
@@ -78,7 +78,7 @@ classifyPoint point nextGroup board@(Board {..}) groups =
     lookupBoard :: Point -> Maybe Piece
     lookupBoard = flip H.lookup layout
 
-membership :: Piece -> Point -> Board -> Group -> Groups -> Groups
+membership :: Piece -> Point -> Board -> Group -> GroupPoints -> GroupPoints
 -- | Search for group members at neighbors of the given point; if any
 -- members are found, add them to the group, and continue by searching
 -- their neighbors.
@@ -132,16 +132,35 @@ calcAndDisplayGroups :: Board -> [[(Group,Point)]]
 -- `groupBoard`
 calcAndDisplayGroups board = displayGroups board $ groupBoard board
 
-displayGroups :: Board -> Groups -> [[(Group,Point)]]
+displayGroups :: Board -> GroupPoints -> [[(Group,Point)]]
 -- | Show the groups hash in a format which is readily human readable
 displayGroups board@(Board {..}) groups =
         inGroups $ sort $ zip groupsOnBoard pointsOnBoard
   where
     groupsOnBoard = catMaybes $ map (flip H.lookup groups) pointsOnBoard
-    pointsOnBoard = filter (flip H.member groups) points
+    pointsOnBoard = H.keys groups
     points = enumeratePoints size
     inGroups = groupBy $ \a b -> (fst a == fst b)
 
+
+explodeGroups :: GroupPoints -> Groups
+-- | From a Point -> Group mapping, calculate the equivalent Group -> [Point] mapping
+explodeGroups gp = foldl buildGroups H.empty $ H.keys gp
+  where
+    buildGroups groups point =
+        let group = H.lookupDefault 0 point gp
+            appendValue = const (point:)
+            in H.insertWith appendValue group [point] groups
+
+implodeGroups :: Groups -> GroupPoints
+-- | From a Group -> [Point] mapping, calculate the equivalent Point ->
+-- Group mapping
+implodeGroups g = foldl buildGroupPoints H.empty $ H.keys g
+  where
+    buildGroupPoints gp group =
+        let points = H.lookupDefault mempty group g
+            insert gp' point = H.insert point group gp'
+            in foldl insert gp points
 
 groupTestBoard :: Board
 groupTestBoard = Board { size = Small, layout = layout }

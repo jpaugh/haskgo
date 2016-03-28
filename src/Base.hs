@@ -23,7 +23,8 @@ type Point = (Int,Int)
 type Group = Int
 -- | A many-to-one mapping from every point on the board to the group that
 -- contains it
-type Groups = HashMap Point Group
+type GroupPoints = HashMap Point Group
+type Groups = HashMap Group [Point]
 type Layout = HashMap Point Piece
 
 data Size = Full
