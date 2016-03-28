@@ -2,6 +2,7 @@ module Main where
 
 import Base
 import Group
+import Liveness
 import Random
 
 import Control.Arrow
@@ -33,7 +34,7 @@ type PlayerPoints = [Point]
 splitBoard :: Board -> (PlayerPoints,PlayerPoints)
 -- | Split the board into two; one contains only White's pieces, while the
 -- other contains only Black's
-splitBoard = foldl onRow 
+splitBoard = foldl onRow
   where
     onRow :: (PlayerPoints, PlayerPoints) -> (Int,[Piece]) -> Use a HashMap?
 -}

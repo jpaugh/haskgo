@@ -13,6 +13,7 @@ executable          haskgo
     main-is:        main.hs
     other-modules:  Base
                     Group
+                    Liveness
                     Random
 
     build-depends:  base, unordered-containers, random

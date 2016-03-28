@@ -27,11 +27,11 @@ instance Random Point where
     random = randomR ((-bound,-bound),(bound,bound))
       where bound = sizeToInt Full `quot` 2
 
-    randomR ((xlo,ylo), (xhi,yhi)) g = ((x,y), g2) 
+    randomR ((xlo,ylo), (xhi,yhi)) g = ((x,y), g2)
       where
         (x,g1) = randomR (xlo,xhi)
         (y,g2) = randomR (ylo,yhi)
-            
+
 -}
 
 instance Random a => Random (Maybe a) where
