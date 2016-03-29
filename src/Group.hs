@@ -100,26 +100,28 @@ adjacentPoints :: Size -> Point -> [Point]
 -- | All of the points which are adjacent to the given point; the size
 -- tells us where the edge of the board is, so we don't count non-existent
 -- points
-adjacentPoints size point@(x,y) = adjacentHelper size point points
+adjacentPoints size (x,y) = filterInBounds size points
   where
     points = [(x+1,y), (x-1,y), (x,y+1), (x,y-1)]
 
 adjacentPointsBefore :: Size -> Point -> [Point]
 -- | The adjacent points which come before the given point in the
 -- `enumeratePoints`
-adjacentPointsBefore size point@(x,y) = adjacentHelper size point points
+adjacentPointsBefore size (x,y) = filterInBounds size points
   where
     points = [(x-1,y), (x,y+1)]
 
 adjacentPointsAfter :: Size -> Point -> [Point]
 -- | The adjacent points which come after the given point in the
 -- `enumeratePoints`
-adjacentPointsAfter size point@(x,y) = adjacentHelper size point points
+adjacentPointsAfter size (x,y) = filterInBounds size points
   where
     points = [(x+1,y), (x,y-1)]
 
-adjacentHelper :: Size -> Point -> [Point] -> [Point]
-adjacentHelper size (x,y) = filter rangeCheck
+filterInBounds :: Size -> [Point] -> [Point]
+-- | Filter out points which are not within the bounds of a gameboard of
+-- the given size
+filterInBounds size = filter rangeCheck
   where
     bound = sizeToInt size `quot` 2
     rangeCheck (a,b)
