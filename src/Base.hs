@@ -18,14 +18,14 @@ data Player = Black
            | White
     deriving (Enum, Eq, Show)
 
-type Piece = Player
+type Stone = Player
 type Point = (Int,Int)
 type Group = Int
 -- | A many-to-one mapping from every point on the board to the group that
 -- contains it
 type GroupPoints = HashMap Point Group
 type Groups = HashMap Group [Point]
-type Layout = HashMap Point Piece
+type Layout = HashMap Point Stone
 
 data Size = Full
           | Mid
@@ -33,7 +33,7 @@ data Size = Full
     deriving (Enum, Eq, Show)
 
 instance Show Board where
-        show (Board {..}) = format $ map showPieceAt $ enumeratePoints size
+        show (Board {..}) = format $ map showStoneAt $ enumeratePoints size
           where
             format :: String -> String
             format =
@@ -42,13 +42,13 @@ instance Show Board where
                     separateRows = subgroup (sizeToInt size)
                     in toLines . spaceCols . separateRows
 
-            showPieceAt :: Point -> Char
-            showPieceAt = showPiece . flip H.lookup layout
+            showStoneAt :: Point -> Char
+            showStoneAt = showStone . flip H.lookup layout
 
-            showPiece :: Maybe Piece -> Char
-            showPiece Nothing = '┼'
-            showPiece (Just Black) = '●'
-            showPiece (Just White) = '○'
+            showStone :: Maybe Stone -> Char
+            showStone Nothing = '┼'
+            showStone (Just Black) = '●'
+            showStone (Just White) = '○'
 
 enumeratePoints :: Size -> [Point]
 -- | Increasing X with each col; decreasing Y with each cell
@@ -73,10 +73,10 @@ isPossibleMove point@(x,y) board = rangeCheck && emptyCheck
                      in range >= abs x && range >= abs y
     emptyCheck = not $ H.member point $ layout board
 
-placePiece :: Piece -> Point -> Board -> Board
-placePiece piece point@(x,y) board
+placeStone :: Stone -> Point -> Board -> Board
+placeStone stone point@(x,y) board
     | not $ isPossibleMove point board = board
-    | otherwise = board {layout = layout board /$ H.insert point piece}
+    | otherwise = board {layout = layout board /$ H.insert point stone}
 
 sizeToInt :: Size -> Int
 -- | The size of the board as an `Int`

@@ -45,20 +45,20 @@ classifyPoint :: Point -> Group -> Board -> GroupPoints -> GroupPoints
 classifyPoint point nextGroup board@(Board {..}) groups =
         case lookupBoard point of
             Nothing -> groups
-            Just piece -> findGroupFor piece
+            Just stone -> findGroupFor stone
   where
 
-    -- Either find an existing, adjacent group to add this piece to, or
+    -- Either find an existing, adjacent group to add this stone to, or
     -- start a new one
-    findGroupFor :: Piece -> GroupPoints
-    findGroupFor piece = insertAndFindMembers $
+    findGroupFor :: Stone -> GroupPoints
+    findGroupFor stone = insertAndFindMembers $
         case adjGroupIdx of
             Nothing -> nextGroup
             Just i -> extractGroup i
       where
-        adjGroupIdx = elemIndex (Just piece) adjPieces
+        adjGroupIdx = elemIndex (Just stone) adjStones
         insertAndFindMembers group =
-            membership piece point board group $
+            membership stone point board group $
                 H.insert point group groups
 
     extractGroup :: Int -> Group
@@ -70,15 +70,15 @@ classifyPoint point nextGroup board@(Board {..}) groups =
 
     -- We use -PointsBefore, because the "after" points will be calculated
     -- later; no need to do double work
-    -- NB: adjPoints and adjPieces are parallel; they must have the same
+    -- NB: adjPoints and adjStones are parallel; they must have the same
     -- ordering and length
     adjPoints = adjacentPointsBefore size point
-    adjPieces = map lookupBoard adjPoints
+    adjStones = map lookupBoard adjPoints
 
-    lookupBoard :: Point -> Maybe Piece
+    lookupBoard :: Point -> Maybe Stone
     lookupBoard = flip H.lookup layout
 
-membership :: Piece -> Point -> Board -> Group -> GroupPoints -> GroupPoints
+membership :: Stone -> Point -> Board -> Group -> GroupPoints -> GroupPoints
 -- | Search for group members at neighbors of the given point; if any
 -- members are found, add them to the group, and continue by searching
 -- their neighbors.
@@ -92,7 +92,7 @@ membership player point board@(Board {..}) group groups = go groups
 
     searchMember groups point
         | H.member point groups = groups            -- Already found
-        | H.lookup point layout /= Just player = groups -- No piece or wrong player
+        | H.lookup point layout /= Just player = groups -- No stone or wrong player
         | otherwise = membership player point board group $ H.insert point group groups
           where
 

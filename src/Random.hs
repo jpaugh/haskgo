@@ -11,7 +11,7 @@ import Data.Unique
 import System.Random
 import qualified Data.HashMap.Lazy as H
 
-instance Random Piece where
+instance Random Stone where
     random = randomR (Black,White)
     randomR (lo,hi) g
         | lo == hi = (lo,g)
@@ -67,7 +67,7 @@ randomLayout size g = (go values, g2)
   where
     go = H.fromList . mapMaybe onlyJust . zip (enumeratePoints size)
 
-    values :: [Maybe Piece]
+    values :: [Maybe Stone]
     values = randoms g1
     (g1,g2) = split g
 

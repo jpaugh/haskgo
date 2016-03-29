@@ -15,7 +15,7 @@ import qualified Data.HashMap.Lazy as H
 {-
 -
 - To calculate groups, we need to convert the board to two lists of points:
-- one for each player's pieces.^1
+- one for each player's stone.^1
 -
 - Then, we can use this mapping to carve up the board into groups
 -
@@ -32,11 +32,11 @@ type PlayerPoints = [Point]
 {-
 
 splitBoard :: Board -> (PlayerPoints,PlayerPoints)
--- | Split the board into two; one contains only White's pieces, while the
+-- | Split the board into two; one contains only White's stone, while the
 -- other contains only Black's
 splitBoard = foldl onRow
   where
-    onRow :: (PlayerPoints, PlayerPoints) -> (Int,[Piece]) -> Use a HashMap?
+    onRow :: (PlayerPoints, PlayerPoints) -> (Int,[Stone]) -> Use a HashMap?
 -}
 
 
