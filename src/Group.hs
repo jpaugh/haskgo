@@ -10,13 +10,13 @@
 --
 -- The groups are identified by one of one of two inter-convertible structures:
 --
--- * `type Groups = HashMap Group [Point]` is the obvious representation,
+-- * @type 'Groups' = HashMap Group [Point]@ is the obvious representation,
 -- with each group referring to its list of points
--- * `type GroupPoints = HashMap Point Group` maps each point to the group
--- which contains it; multiple keys map to the same entry. This
+-- * @type 'GroupPoints' = HashMap Point Group@ maps each point to the
+-- group which contains it; multiple keys map to the same entry. This
 -- representation is easier to construct from a given board position
 --
--- The groups data structures (`Groups`, `GroupPoints`) do not retain
+-- The groups data structures ('Groups', 'GroupPoints') do not retain
 -- player information; but one may infer that adjacent groups are of
 -- different colors, and the color can be retrieved by consulting the board
 -- itself
@@ -42,12 +42,13 @@ groupBoard board@(Board {..}) = foldl classify H.empty $ zip points groupNumbers
     groupNumbers = [1..81]
 
 classifyPoint :: Point -> Group -> Board -> GroupPoints -> GroupPoints
+-- |Classify a point as either in an existing group, or the founding member
+-- of a new group; either way, store it into the 'GroupPoints' hash
 classifyPoint point nextGroup board@(Board {..}) groups =
         case lookupBoard point of
             Nothing -> groups
             Just stone -> findGroupFor stone
   where
-
     -- Either find an existing, adjacent group to add this stone to, or
     -- start a new one
     findGroupFor :: Stone -> GroupPoints
@@ -85,7 +86,7 @@ membership :: Stone -> Point -> Board -> Group -> GroupPoints -> GroupPoints
 --
 -- This function is needed because we cannot reliably coalesce all group
 -- members with only a single pass in an in-order traversal; thus
--- `membership` traverses ahead of the normal pass
+-- @membership@ traverses ahead of the normal pass
 membership player point board@(Board {..}) group groups = go groups
   where
     go = flip (foldl searchMember) (adjacentPoints size point)
@@ -98,7 +99,7 @@ membership player point board@(Board {..}) group groups = go groups
 
 adjacentPoints :: Size -> Point -> [Point]
 -- | All of the points which are adjacent to the given point; the size
--- tells us where the edge of the board is, so we don't count non-existent
+-- tells us where the edge of the board is, so we do not count non-existent
 -- points
 adjacentPoints size (x,y) = filterInBounds size points
   where
@@ -106,14 +107,14 @@ adjacentPoints size (x,y) = filterInBounds size points
 
 adjacentPointsBefore :: Size -> Point -> [Point]
 -- | The adjacent points which come before the given point in the
--- `enumeratePoints`
+-- 'enumeratePoints'
 adjacentPointsBefore size (x,y) = filterInBounds size points
   where
     points = [(x-1,y), (x,y+1)]
 
 adjacentPointsAfter :: Size -> Point -> [Point]
 -- | The adjacent points which come after the given point in the
--- `enumeratePoints`
+-- 'enumeratePoints'
 adjacentPointsAfter size (x,y) = filterInBounds size points
   where
     points = [(x+1,y), (x,y-1)]
@@ -130,8 +131,8 @@ filterInBounds size = filter rangeCheck
         | otherwise = True
 
 calcAndDisplayGroups :: Board -> [[(Group,Point)]]
--- | Convenience function to call `displayGroups`on the output of
--- `groupBoard`
+-- | Convenience function to call 'displayGroups' on the output of
+-- 'groupBoard'
 calcAndDisplayGroups board = displayGroups board $ groupBoard board
 
 displayGroups :: Board -> GroupPoints -> [[(Group,Point)]]
@@ -165,6 +166,8 @@ implodeGroups g = foldl buildGroupPoints H.empty $ H.keys g
             in foldl insert gp points
 
 groupTestBoard :: Board
+-- | A sample board with a complicated grouping; a sanity test for
+-- 'groupBoard'
 groupTestBoard = Board { size = Small, layout = layout }
   where
     layout = H.fromList $ concat

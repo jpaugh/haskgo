@@ -1,3 +1,4 @@
+-- | Generate random board positions
 module Random where
 
 import Base
@@ -11,6 +12,7 @@ import Data.Unique
 import System.Random
 import qualified Data.HashMap.Lazy as H
 
+-- |Random instance for 'Stone' with uniform distribution
 instance Random Stone where
     random = randomR (Black,White)
     randomR (lo,hi) g
@@ -18,6 +20,7 @@ instance Random Stone where
         | otherwise = toEnum `first` randomR (0,1) g
             where fromBool bool = if bool then Black else White
 
+-- |Random instance for 'Size' with uniform distribution
 instance Random Size where
     random = first toEnum . randomR (0,2)
     randomR (lo,hi) = first toEnum . randomR (fromEnum lo, fromEnum hi)
@@ -34,35 +37,46 @@ instance Random Point where
 
 -}
 
+-- |Randomly choose whether to supply a value or 'Nothing'. The weighting
+-- between 'Nothing' and @Just something@ is arbitrary, and defined by
+-- 'justWeight'
 instance Random a => Random (Maybe a) where
-    random g = intToMaybe v `first` randomR (0,justWeight) g2
+    random g = intToMaybe v `first` randomR (1,justWeight) g2
       where
         (g1, g2) = split g
         v = fst $ random g1
 
-    randomR (Just lo, Just hi) g = intToMaybe v `first` randomR (0,justWeight) g2
+    randomR (Just lo, Just hi) g = intToMaybe v `first` randomR (1,justWeight) g2
       where
         (g1, g2) = split g
         v = fst $ randomR (lo,hi) g1
     randomR _ g = random g
 
-justWeight = 1
+-- | The weight of a @Just something@ compared to a 'Nothing'. The weight of
+-- a 'Nothing' is @1/justWeight@
+justWeight = 2
 
 intToMaybe :: v -> Int -> Maybe v
+-- |Helper for the @Random Maybe@ instance
 intToMaybe v i = if i == 1 then Nothing else Just v
 
+
 randomBoard :: RandomGen g => g -> (Board,g)
+-- |Generate a random board of any size. See also 'randomBoardAtSize'
 randomBoard g = (Board {..}, g2)
     where
         (size,g1) = random g
         (layout,g2) = randomLayout size g1
 
 randomBoardAtSize :: RandomGen g => Size -> g -> (Board,g)
+-- |Generate a random board of the given size
 randomBoardAtSize size g = (Board {..}, g1)
   where
     (layout,g1) = randomLayout size g
 
 randomLayout :: RandomGen g => Size -> g -> (Layout,g)
+-- |Generate a random board layout, at the given size; See also
+-- 'randomBoardAtSize'
 randomLayout size g = (go values, g2)
   where
     go = H.fromList . mapMaybe onlyJust . zip (enumeratePoints size)

@@ -1,3 +1,5 @@
+-- |Dummy main. This module makes a great entry point for *GHCI*, because
+-- it imports nearly everything else. Otherwise, it serves no purpose
 module Main where
 
 import Base
@@ -12,32 +14,5 @@ import Data.Maybe
 import System.Random
 import qualified Data.HashMap.Lazy as H
 
-{-
--
-- To calculate groups, we need to convert the board to two lists of points:
-- one for each player's stone.^1
--
-- Then, we can use this mapping to carve up the board into groups
--
-- 1: This format might actually be preferable to the display representation
-- currently used.
--
-- (0,0) is the center pice. This means we can use the same `empty` function
-- for all board types
--}
-
-type Groups = [[Point]]
-type PlayerPoints = [Point]
-
-{-
-
-splitBoard :: Board -> (PlayerPoints,PlayerPoints)
--- | Split the board into two; one contains only White's stone, while the
--- other contains only Black's
-splitBoard = foldl onRow
-  where
-    onRow :: (PlayerPoints, PlayerPoints) -> (Int,[Stone]) -> Use a HashMap?
--}
-
-
+-- | Dummy main
 main = putStrLn "Hello, World!"

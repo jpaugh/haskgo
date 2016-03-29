@@ -1,3 +1,4 @@
+-- |Calculate whether a group is alive or dead
 module Liveness where
 
 import Base
@@ -20,6 +21,9 @@ deadGroups board = filter (`notElem` liveHelper board groups) $ H.keys groups
     groups = explodeGroups $ groupBoard board
 
 liveHelper :: Board -> Groups -> [Group]
+-- |Collect a list of all live groups within the game board, given a list
+-- of groups. This is an internal function. Use `liveGroups` or
+-- `deadGroups` instead
 liveHelper board@(Board {..}) groups = foldl (flip go) mempty $ H.keys groups
   where
     go group =
